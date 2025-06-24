@@ -60,6 +60,6 @@ An arcade-style educational game that raises awareness about environmental clean
 - 🏆 **1st Place Winner** – Game Designing Category at the **International Digital Fest 2023**, awarded a **cash prize of 2000 AED**
 - 🥇 **Best Gaming Hack** – Recognized at **Boost Hacks II** for excellence in gameplay design and innovation
 - Developed as part of an initiative to combine **environmental awareness** with interactive technology
-- Special thanks to **Pygame** and its open documentation for helpful tutorials and inspiration during development
+- Special thanks to **Pygame** and its open documentation and various Youtube content creators for helpful tutorials and inspiration during development
 
 
