@@ -2,6 +2,7 @@
 
 An arcade-style educational game that raises awareness about environmental cleanliness through fun and interactive gameplay. Built using Python and Pygame, Litter Ballista is a fast-paced shooter game where you aim to sort and eliminate litter correctly before time runs out.
 
+<img width="969" alt="Screenshot 2024-06-16 at 12 59 47 AM" src="https://github.com/user-attachments/assets/c16e4246-3412-43e4-a0e3-96277c658cf0" />
 
 
 ## 🔧 Tech Stack
@@ -20,8 +21,12 @@ An arcade-style educational game that raises awareness about environmental clean
 - 📚 Eco-awareness integrated into gameplay elements
 
 ---
-
-
+## 📸 Screenshots
+<img width="693" alt="Screenshot 2025-06-24 at 5 10 46 PM" src="https://github.com/user-attachments/assets/7f05e0e4-4f01-480a-87f1-67d36f51699a" />
+<img width="707" alt="Screenshot 2025-06-24 at 5 09 26 PM" src="https://github.com/user-attachments/assets/a115b03d-e905-418b-aaa5-b948a5f1919b" />
+<img width="694" alt="Screenshot 2025-06-24 at 5 09 49 PM" src="https://github.com/user-attachments/assets/4ce30b41-c4dd-4b35-8d09-275665bf966c" />
+<img width="684" alt="Screenshot 2025-06-24 at 5 10 07 PM" src="https://github.com/user-attachments/assets/5688bd61-df58-4b18-b42e-59ca400ee62a" />
+---
 
 ## 🚀 Installation & Running
 
