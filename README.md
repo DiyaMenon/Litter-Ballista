@@ -30,8 +30,10 @@ An arcade-style educational game that raises awareness about environmental clean
    git clone https://github.com/DiyaMenon/Litter-Ballista.git
    cd Litter-Ballista
 2. Install dependencies:
+   ```bash
    pip install pygame
 3. Run the game:
+   ```bash
    python main.py
 
 
