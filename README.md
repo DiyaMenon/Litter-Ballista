@@ -1,25 +1,66 @@
-# Litter-Ballista
-Litter Balista: Shoot for a Cleaner Planet!
+# 🌍 Litter Ballista: Shoot for a Cleaner Planet!
 
-## Inspiration
-The inspiration for Litter Ballista stemmed from a growing need to raise **environmental awareness** among children in a fun and engaging way. Seeing the increasing impact of pollution on our planet, we wanted to create an educational tool that would both entertain and inform young players about the importance of environmental conservation. By combining gaming with education, we aimed to spark a sense of responsibility and curiosity about keeping our environment clean.
+An arcade-style educational game that raises awareness about environmental cleanliness through fun and interactive gameplay. Built using Python and Pygame, Litter Ballista is a fast-paced shooter game where you aim to sort and eliminate litter correctly before time runs out.
 
-## What it does
-Litter Ballista is an educational game designed to teach children about environmental pollution. The game features three levels, each progressively more challenging, where players identify and eliminate pollutants. It offers three play modes:
-1. **Freeplay Mode:** Players aim to complete the game as quickly as possible.
-2. **Countdown Mode:** Players score as many points as they can within a 30-second timer.
-3. **Accuracy Mode:** Players use 81 shots to score the highest number of points.
-The game includes features such as pause and restart options, high score tracking, and a point system that rewards players for targeting harder-to-hit objects, all aimed at making the learning process both engaging and effective.
 
-## How I built it
-I developed Litter Ballista using _Python_, leveraging libraries (specifically the _pygame_ library) and frameworks that facilitated game design and user interaction. The game’s architecture was built to ensure smooth gameplay and educational value. The graphical elements and game mechanics were carefully designed to make the game both visually appealing and challenging. We used _Tkinter_ for creating the game interface and managing user input, ensuring that the game runs efficiently and provides a seamless experience for players.
 
-## Challenges I ran into
-One of the main challenges was finding the **right balance between fun and educational content.** It was crucial to design a game that was both entertaining and effective in conveying environmental messages. Another challenge was ensuring the **game’s difficulty** was appropriate for its target audience, which required extensive testing and adjustment. Additionally, integrating educational content without overwhelming players posed a significant challenge, necessitating a careful approach to game design and content presentation.
+## 🔧 Tech Stack
+- **Python 3.9+**
+- **Pygame** – For 2D graphics, animation, and game loop
+- **Tkinter** – For basic UI menus (optional usage)
 
-## Accomplishments that I'm proud of
-I am proud of successfully integrating educational content with entertaining gameplay. Litter Ballista not only engages children but also educates them about environmental conservation in a way that is both enjoyable and impactful. The game’s high score tracking and various play modes have been appreciated at International Digital Fest and received a **cash price of AED 2000**, providing players with multiple ways to interact and learn. 
+---
 
-## What I learned
-Through the development of Litter Ballista, I learnt valuable lessons about combining educational content with interactive design. Balancing educational value with engaging gameplay is challenging but crucial for creating a successful educational game. I also gained insights into the importance of user feedback and iterative development, which helped me refine the game to better meet players’ needs and enhance their learning experience.
+## 🌟 Features
+- 🎮 Arcade-style gameplay with increasing difficulty
+- 🗑️ Different trash items (paper, plastic, glass, etc.)
+- ⏱️ Countdown timer and real-time scoring
+- 💾 High-score tracking stored across sessions
+- 🎯 Modes: Accuracy, Speed, Freeplay
+- 📚 Eco-awareness integrated into gameplay elements
+
+---
+
+
+
+## 🚀 Installation & Running
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/DiyaMenon/Litter-Ballista.git
+   cd Litter-Ballista
+2. Install dependencies:
+   pip install pygame
+3. Run the game:
+   python main.py
+
+
+## 📚 What I Learned
+- Built and debugged a complete 2D game using Pygame  
+- Learned about game loops, event handling, and sprite animation  
+- Integrated file I/O to store and retrieve player scores  
+- Improved problem-solving by handling in-game collisions and logic  
+- Gained experience designing UI/UX for simple but intuitive gameplay  
+- Understood how to combine educational content with engaging design  
+
+## 💡 Future Improvements
+- Add different game levels with increasing difficulty and complexity  
+- Implement a global leaderboard using an online database or API  
+- Add animations and power-ups to make the game more dynamic  
+- Optimize the game for mobile platforms using Kivy or Pygbag  
+
+## Project Structure
+Litter-Ballista/
+├── assets/                 # Game assets (images, sounds, icons)
+├── high_scores.txt         # Stores persistent high scores
+├── main.py                 # Main game loop and logic
+├── README.md               # Project documentation
+
+## 🤝 Acknowledgments
+
+- 🏆 **1st Place Winner** – Game Designing Category at the **International Digital Fest 2023**, awarded a **cash prize of 2000 AED**
+- 🥇 **Best Gaming Hack** – Recognized at **Boost Hacks II** for excellence in gameplay design and innovation
+- Developed as part of an initiative to combine **environmental awareness** with interactive technology
+- Special thanks to **Pygame** and its open documentation, and to **Tech with Tim** on YouTube for helpful tutorials and inspiration during development
+
 
