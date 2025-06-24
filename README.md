@@ -36,7 +36,6 @@ An arcade-style educational game that raises awareness about environmental clean
    ```bash
    python main.py
 
-
 ## 📚 What I Learned
 - Built and debugged a complete 2D game using Pygame  
 - Learned about game loops, event handling, and sprite animation  
@@ -50,13 +49,6 @@ An arcade-style educational game that raises awareness about environmental clean
 - Implement a global leaderboard using an online database or API  
 - Add animations and power-ups to make the game more dynamic  
 - Optimize the game for mobile platforms using Kivy or Pygbag  
-
-## Project Structure
-Litter-Ballista/
-├── assets/                 # Game assets (images, sounds, icons)
-├── high_scores.txt         # Stores persistent high scores
-├── main.py                 # Main game loop and logic
-├── README.md               # Project documentation
 
 ## 🤝 Acknowledgments
 
