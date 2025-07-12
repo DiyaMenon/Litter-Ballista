@@ -1,7 +1,9 @@
 # Litter Ballista!!!
 import pygame
 import math
+#other imports from files
 from fact_popup import show_fact_popup
+from powerups import ScoreMultiplierPowerUp
 
 pygame.init()
 
@@ -51,6 +53,12 @@ pause = False
 clicked = False
 write_values = False
 new_coords = True
+
+#powerups
+score_multiplier = ScoreMultiplierPowerUp(WIDTH, HEIGHT)
+multiplier_active = False
+last_star_spawn_time = 0
+star_spawn_interval = 25  # seconds
 
 one_coords = [[], [], []]
 two_coords = [[], [], []]
@@ -118,6 +126,9 @@ def draw_score():
     if mode == 2:
         mode_text = font.render(f'Time Remaining {time_remaining}', True, 'black')
     screen.blit(mode_text, (320, 741))
+    if score_multiplier.active:
+        multiplier_text = font.render("2X SCORE ACTIVE!", True, 'red')
+        screen.blit(multiplier_text, (320, 768))
 
 
 
@@ -198,7 +209,10 @@ def check_shot(targets, coords):
         for j in range(len(targets[i])):
             if targets[i][j].collidepoint(mouse_pos):
                 coords[i].pop(j)
-                points += 10 + 10 * (i ** 2)
+                if score_multiplier.active:
+                    points += 2 * (10 + 10 * (i ** 2))
+                else:
+                    points += 10 + 10 * (i ** 2)
                 #i is whateevr tire you are looking into and j is the place in the coords and where it is in the targets list 
                 #different points for different tiers
 
@@ -330,6 +344,16 @@ def draw_pause():
 run = True
 while run:
     timer.tick(fps)
+    #Spawns the power-up only once every 25 seconds, not every 8.
+    #Prevents repeated spawns within the same second.
+    current_time = pygame.time.get_ticks() // 1000
+    if (
+        current_time - last_star_spawn_time > star_spawn_interval
+        and not score_multiplier.visible
+        and not score_multiplier.active
+    ):
+        score_multiplier.spawn()
+        last_star_spawn_time = current_time
     if level != 0:
         if counter < 60:
             counter += 1
@@ -361,6 +385,8 @@ while run:
     screen.fill('black')
     screen.blit(bgs[level - 1], (0, 0))
     screen.blit(banners[level - 1], (0, HEIGHT - 200))
+    score_multiplier.update()
+    score_multiplier.draw(screen)
     if menu:
         level = 0
         draw_menu()
@@ -400,6 +426,7 @@ while run:
             mouse_position = pygame.mouse.get_pos()
             if (0 < mouse_position[0] < WIDTH) and (0 < mouse_position[1] < HEIGHT - 200):
                 shot = True
+                score_multiplier.check_collision(mouse_position)
                 total_shots += 1
                 if mode == 1:
                     ammo -= 1
