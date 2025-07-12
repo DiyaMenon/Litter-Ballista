@@ -3,12 +3,33 @@ import pygame
 import random
 
 environmental_facts = [
-    "Recycling one can saves enough energy to run a TV for 3 hours.",
-    "Plastic takes over 400 years to degrade in nature.",
-    "1 ton of recycled paper saves 17 trees.",
-    "Composting food waste reduces landfill methane.",
-    "Recycling 1 ton of plastic saves 16 barrels of oil."
+    "Recycling one aluminum can saves enough energy to run a TV for 3 hours.",
+    "Plastic takes over 400 years to degrade in the environment.",
+    "1 ton of recycled paper saves 17 trees and 7,000 gallons of water.",
+    "Composting food waste reduces methane emissions from landfills.",
+    "Recycling 1 ton of plastic saves 16 barrels of oil.",
+    "Every ton of recycled steel saves 2,500 pounds of iron ore.",
+    "Over 1 million marine animals die each year from plastic pollution.",
+    "The average person produces over 4 pounds of trash per day.",
+    "Recycling a glass bottle saves enough energy to power a computer for 30 minutes.",
+    "Only 9% of plastic ever produced has been recycled.",
+    "It takes 500–1,000 years for plastic to degrade in landfills.",
+    "Producing new paper from recycled paper uses 70% less energy.",
+    "Cutting down trees for paper is one of the leading causes of deforestation.",
+    "Electronic waste is the fastest-growing waste stream in the world.",
+    "A single plastic bag can kill multiple marine animals if mistaken for food.",
+    "Landfills are the third-largest source of methane emissions globally.",
+    "You can save 1,460 gallons of water per year by turning off the tap while brushing your teeth.",
+    "A leaky faucet can waste over 3,000 gallons of water a year.",
+    "Transporting bottled water uses over 17 million barrels of oil per year.",
+    "Using a reusable water bottle can save an average of 167 plastic bottles per person annually.",
+    "Fast fashion is responsible for 10% of global carbon emissions.",
+    "Producing meat generates significantly more CO2 than growing vegetables.",
+    "Burning trash releases toxic chemicals and greenhouse gases into the atmosphere.",
+    "Switching to LED bulbs can reduce your carbon footprint significantly.",
+    "Protecting forests helps absorb 2.6 billion tons of CO2 every year."
 ]
+
 
 def show_fact_popup(screen, font):
     fact = random.choice(environmental_facts)
