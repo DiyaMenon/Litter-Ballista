@@ -1,6 +1,7 @@
 # Litter Ballista!!!
 import pygame
 import math
+from fact_popup import show_fact_popup
 
 pygame.init()
 
@@ -418,8 +419,10 @@ while run:
 
      #what to do next when a level is over
     if level > 0:
-        if target_boxes == [[], [], []] and level < 3:                                           # if target boxes is empty and level <3 go to next level
+        if target_boxes == [[], [], []] and level < 3:
+            show_fact_popup(screen, font)  # ⬅️ Add this line to show a random fact
             level += 1
+            new_coords = True              # Reset enemy positions
         if (level == 3 and target_boxes == [[], [], [], []]) or (mode == 1 and ammo == 0) or (
                 mode == 2 and time_remaining == 0):
             new_coords = True
