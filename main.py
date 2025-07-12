@@ -6,6 +6,12 @@ from powerups import PowerUpManager
 from environmental_facts import EnvironmentalFacts
 from sorting_challenge import SortingChallenge
 from weather_effects import WeatherEffect
+from impact_tracker import ImpactTracker
+from achievement_system import AchievementSystem
+from particle_effects import ParticleSystem, ScreenShake
+from puzzle_mode import PuzzleMode
+from campaign_mode import CampaignMode
+from ui_animations import UIAnimations
 
 pygame.init()
 
@@ -42,6 +48,13 @@ power_up_manager = PowerUpManager()
 environmental_facts = EnvironmentalFacts()
 sorting_challenge = SortingChallenge()
 weather_effect = WeatherEffect()
+impact_tracker = ImpactTracker()
+achievement_system = AchievementSystem()
+particle_system = ParticleSystem()
+screen_shake = ScreenShake()
+puzzle_mode = PuzzleMode()
+campaign_mode = CampaignMode()
+ui_animations = UIAnimations()
 
 
 #for mode 0=freeplay, 1=accuracy, 2=timed
@@ -63,6 +76,8 @@ write_values = False
 new_coords = True
 show_challenge = False
 challenge_cooldown = 0
+show_achievements = False
+targets_hit_this_game = 0
 
 one_coords = [[], [], []]
 two_coords = [[], [], []]
@@ -164,6 +179,9 @@ def draw_gun():
         if mouse_pos[1] < 600:
             screen.blit(pygame.transform.rotate(gun, 90 - rotation), (WIDTH / 2 - 90, HEIGHT - 250))
             if clicks[0]:
+                # Add muzzle flash effect
+                particle_system.add_muzzle_flash(WIDTH / 2 - 45, HEIGHT - 200, angle)
+                
                 # Multi-shot power-up
                 if power_up_manager.is_active('multi_shot'):
                     for i in range(3):
@@ -177,6 +195,9 @@ def draw_gun():
         if mouse_pos[1] < 600:
             screen.blit(pygame.transform.rotate(gun, 270 - rotation), (WIDTH / 2 - 30, HEIGHT - 250))
             if clicks[0]:
+                # Add muzzle flash effect
+                particle_system.add_muzzle_flash(WIDTH / 2 + 15, HEIGHT - 200, angle)
+                
                 # Multi-shot power-up
                 if power_up_manager.is_active('multi_shot'):
                     for i in range(3):
@@ -231,7 +252,7 @@ def draw_level(coords):
 
 #checking when we have shot and we need to pass in the list of targets and the coordniate list 
 def check_shot(targets, coords):
-    global points
+    global points, targets_hit_this_game
     mouse_pos = pygame.mouse.get_pos()
     
     # Apply weather accuracy modifier
@@ -258,7 +279,17 @@ def check_shot(targets, coords):
                     base_points = 10 + 10 * (i ** 2)
                     score_multiplier = power_up_manager.get_score_multiplier()
                     points += base_points * score_multiplier
+                    targets_hit_this_game += 1
                     hit_detected = True
+                    
+                    # Add particle effects
+                    particle_system.add_hit_effect(hit_pos[0], hit_pos[1], level)
+                    screen_shake.add_shake(3, 10)
+                    
+                    # Update impact tracker and achievements
+                    impact_tracker.add_item('litter', level)
+                    achievement_system.update_progress('targets_hit', 1)
+                    achievement_system.update_progress('items_cleaned', 1)
                     
                     if level == 1:
                         bird_sound.play()
@@ -280,20 +311,55 @@ def check_shot(targets, coords):
 def draw_menu():
     global game_over, pause, mode, level, menu, time_passed, total_shots, points, ammo
     global time_remaining, best_freeplay, best_ammo, best_timed, write_values, clicked, new_coords
-    global challenge_cooldown
+    global challenge_cooldown, targets_hit_this_game
     game_over = False
     pause = False
     challenge_cooldown = 0
+    targets_hit_this_game = 0
     screen.blit(menu_img, (0, 0))
     mouse_pos = pygame.mouse.get_pos()
     clicks = pygame.mouse.get_pressed()
-    freeplay_button = pygame.rect.Rect((170, 524), (260, 100))
+    
+    # Animated buttons
+    freeplay_button = ui_animations.draw_animated_button(
+        screen, pygame.Rect(170, 524, 260, 100), (100, 150, 100), 
+        "FREEPLAY", font, mouse_pos, "freeplay"
+    )
     screen.blit(font.render(f'{best_freeplay}', True, 'black'), (340, 580))
-    ammo_button = pygame.rect.Rect((475, 524), (260, 100))
+    
+    ammo_button = ui_animations.draw_animated_button(
+        screen, pygame.Rect(475, 524, 260, 100), (150, 100, 100), 
+        "ACCURACY", font, mouse_pos, "accuracy"
+    )
     screen.blit(font.render(f'{best_ammo}', True, 'black'), (650, 580))
-    timed_button = pygame.rect.Rect((170, 661), (260, 100))
+    
+    timed_button = ui_animations.draw_animated_button(
+        screen, pygame.Rect(170, 661, 260, 100), (100, 100, 150), 
+        "TIMED", font, mouse_pos, "timed"
+    )
     screen.blit(font.render(f'{best_timed}', True, 'black'), (350, 710))
-    reset_button = pygame.rect.Rect((475, 661), (260, 100))
+    
+    # New mode buttons
+    puzzle_button = ui_animations.draw_animated_button(
+        screen, pygame.Rect(50, 400, 200, 80), (150, 100, 150), 
+        "PUZZLE", font, mouse_pos, "puzzle"
+    )
+    
+    campaign_button = ui_animations.draw_animated_button(
+        screen, pygame.Rect(650, 400, 200, 80), (100, 150, 150), 
+        "CAMPAIGN", font, mouse_pos, "campaign"
+    )
+    
+    achievements_button = ui_animations.draw_animated_button(
+        screen, pygame.Rect(350, 400, 200, 80), (150, 150, 100), 
+        "ACHIEVEMENTS", small_font, mouse_pos, "achievements"
+    )
+    
+    reset_button = ui_animations.draw_animated_button(
+        screen, pygame.Rect(475, 661, 260, 100), (150, 150, 150), 
+        "RESET", font, mouse_pos, "reset"
+    )
+    
     if freeplay_button.collidepoint(mouse_pos) and clicks[0] and not clicked:
         mode = 0
         level = 1
@@ -303,6 +369,7 @@ def draw_menu():
         points = 0
         clicked = True
         new_coords = True
+        ui_animations.start_transition('fade')
         environmental_facts.show_random_fact()
     if ammo_button.collidepoint(mouse_pos) and clicks[0] and not clicked:
         mode = 1
@@ -314,6 +381,7 @@ def draw_menu():
         points = 0
         clicked = True
         new_coords = True
+        ui_animations.start_transition('fade')
         environmental_facts.show_random_fact()
     if timed_button.collidepoint(mouse_pos) and clicks[0] and not clicked:
         mode = 2
@@ -325,7 +393,22 @@ def draw_menu():
         points = 0
         clicked = True
         new_coords = True
+        ui_animations.start_transition('fade')
         environmental_facts.show_random_fact()
+    if puzzle_button.collidepoint(mouse_pos) and clicks[0] and not clicked:
+        puzzle_mode.start_puzzle_mode()
+        menu = False
+        clicked = True
+        ui_animations.start_transition('slide')
+    if campaign_button.collidepoint(mouse_pos) and clicks[0] and not clicked:
+        campaign_mode.start_campaign()
+        menu = False
+        clicked = True
+        ui_animations.start_transition('fade')
+    if achievements_button.collidepoint(mouse_pos) and clicks[0] and not clicked:
+        global show_achievements
+        show_achievements = True
+        clicked = True
     if reset_button.collidepoint(mouse_pos) and clicks[0] and not clicked:
         best_freeplay = 0
         best_ammo = 0
@@ -341,7 +424,7 @@ def draw_menu():
 
 
 def draw_game_over():
-    global clicked, level, pause, game_over, menu, points, total_shots, time_passed, time_remaining
+    global clicked, level, pause, game_over, menu, points, total_shots, time_passed, time_remaining, targets_hit_this_game
     if mode == 0:
         display_score = time_passed
     else:
@@ -352,6 +435,15 @@ def draw_game_over():
     exit_button = pygame.rect.Rect((170, 661), (260, 100))
     menu_button = pygame.rect.Rect((475, 661), (260, 100))
     screen.blit(big_font.render(f'{display_score}', True, 'black'), (650, 570))
+    
+    # Show impact summary
+    impact_tracker.show_impact_summary()
+    
+    # Update achievements
+    if total_shots > 0:
+        accuracy = (targets_hit_this_game / total_shots) * 100
+        achievement_system.update_progress('accuracy', accuracy)
+    
     if menu_button.collidepoint(mouse_pos) and clicks[0] and not clicked:
         clicked = True
         level = 0
@@ -362,6 +454,7 @@ def draw_game_over():
         total_shots = 0
         time_passed = 0
         time_remaining = 0
+        targets_hit_this_game = 0
     if exit_button.collidepoint(mouse_pos) and clicks[0] and not clicked:
         global run
         run = False
@@ -371,7 +464,7 @@ def draw_game_over():
 
 def draw_pause():
     global level, pause, menu, points, total_shots, time_passed, time_remaining, clicked, new_coords
-    global challenge_cooldown
+    global challenge_cooldown, targets_hit_this_game
     screen.blit(pause_img, (0, 0))
     mouse_pos = pygame.mouse.get_pos()
     clicks = pygame.mouse.get_pressed()
@@ -393,6 +486,7 @@ def draw_pause():
         clicked = True
         new_coords = True
         challenge_cooldown = 0
+        targets_hit_this_game = 0
 
 
 
@@ -416,14 +510,32 @@ while run:
     if level > 0:
         power_up_manager.update()
         weather_effect.update()
+        particle_system.update()
+        screen_shake.update()
         
         # Trigger sorting challenge randomly
         if not sorting_challenge.active and challenge_cooldown <= 0 and random.randint(1, 1800) == 1:  # ~30 second average
             sorting_challenge.start_challenge()
             challenge_cooldown = 1800  # 30 second cooldown
     
+    # Update all systems
     environmental_facts.update()
     sorting_challenge.update()
+    impact_tracker.update()
+    achievement_system.update()
+    ui_animations.update()
+    
+    # Update special modes
+    if puzzle_mode.active:
+        puzzle_mode.update()
+    if campaign_mode.active:
+        campaign_mode.update({
+            'time_passed': time_passed,
+            'total_shots': total_shots,
+            'targets_hit': targets_hit_this_game,
+            'points': points,
+            'targets_remaining': len([t for sublist in [one_coords, two_coords, three_coords] for t in sublist if t])
+        })
 
     if new_coords:
         # initialize enemy coordinates
@@ -444,12 +556,36 @@ while run:
                 three_coords[i].append((WIDTH // (my_list[i]) * j, 300 - (i * 100) + 30 * (j % 2)))
         new_coords = False
 
+    # Apply screen shake
+    shake_offset = screen_shake.get_offset()
+    
     screen.fill('black')
-    screen.blit(bgs[level - 1], (0, 0))
-    screen.blit(banners[level - 1], (0, HEIGHT - 200))
+    
+    # Handle special modes
+    if puzzle_mode.active:
+        puzzle_mode.draw(screen, font, big_font, target_images)
+    elif campaign_mode.active:
+        if campaign_mode.story_showing:
+            campaign_mode.draw_story(screen, font, big_font)
+        else:
+            # Draw campaign level background
+            bg_id = campaign_mode.levels[campaign_mode.current_level].background_id - 1
+            screen.blit(bgs[bg_id], shake_offset)
+            screen.blit(banners[bg_id], (shake_offset[0], HEIGHT - 200 + shake_offset[1]))
+        campaign_mode.draw_level_complete(screen, font, big_font)
+        campaign_mode.draw_campaign_complete(screen, font, big_font)
+    elif level > 0:
+        # Normal game modes
+        bg_id = achievement_system.current_background - 1
+        screen.blit(bgs[bg_id], shake_offset)
+        screen.blit(banners[bg_id], (shake_offset[0], HEIGHT - 200 + shake_offset[1]))
+    
     if menu:
         level = 0
+        ui_animations.draw_particle_background(screen)
         draw_menu()
+        if show_achievements:
+            achievement_system.draw_achievements_menu(screen, font, big_font)
     if game_over:
         level = 0
         draw_game_over()
@@ -478,25 +614,71 @@ while run:
     if level > 0:
         draw_gun()
         draw_score()
+        impact_tracker.draw_mini_tracker(screen, small_font)
         
         # Draw new systems
         power_up_manager.draw(screen, small_font)
         power_up_manager.draw_active_effects(screen, small_font)
         weather_effect.draw(screen)
         weather_effect.draw_weather_indicator(screen, small_font)
+        
+        # Draw particle effects
+        particle_system.draw(screen)
     
     # Draw overlays (always on top)
     environmental_facts.draw(screen, font, big_font)
     sorting_challenge.draw(screen, font, big_font)
+    impact_tracker.draw_impact_summary(screen, font, big_font)
+    achievement_system.draw_notification(screen, font)
+    
+    # Draw UI transitions
+    ui_animations.draw_transition(screen)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                if show_achievements:
+                    show_achievements = False
+                elif puzzle_mode.active:
+                    puzzle_mode.active = False
+                    menu = True
+                elif campaign_mode.active:
+                    campaign_mode.active = False
+                    menu = True
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             mouse_position = pygame.mouse.get_pos()
             
+            # Handle achievements menu
+            if show_achievements:
+                show_achievements = False
+                continue
+            
+            # Handle special modes
+            if puzzle_mode.active:
+                if puzzle_mode.handle_level_complete_click() or puzzle_mode.handle_mode_complete_click():
+                    if not puzzle_mode.active:
+                        menu = True
+                    continue
+                if puzzle_mode.handle_shot(mouse_position):
+                    achievement_system.update_progress('shots_fired', 1)
+                continue
+            
+            if campaign_mode.active:
+                if campaign_mode.handle_story_click():
+                    continue
+                if campaign_mode.handle_level_complete_click() or campaign_mode.handle_campaign_complete_click():
+                    if not campaign_mode.active:
+                        menu = True
+                    continue
+            
             # Handle environmental facts click
             if environmental_facts.handle_click():
+                continue
+            
+            # Handle impact tracker click
+            if impact_tracker.handle_click():
                 continue
             
             # Handle sorting challenge clicks
@@ -509,11 +691,13 @@ while run:
             
             # Handle power-up collection
             if level > 0:
-                power_up_manager.check_collection(mouse_position, True)
+                if power_up_manager.check_collection(mouse_position, True):
+                    particle_system.add_power_up_effect(mouse_position[0], mouse_position[1], 'collected')
             
             if (0 < mouse_position[0] < WIDTH) and (0 < mouse_position[1] < HEIGHT - 200):
                 shot = True
                 total_shots += 1
+                achievement_system.update_progress('shots_fired', 1)
                 if mode == 1:
                     ammo -= 1
             if (670 < mouse_position[0] < 860) and (660 < mouse_position[1] < 715):
@@ -534,10 +718,15 @@ while run:
     if level > 0:
         if target_boxes == [[], [], []] and level < 3:                                           # if target boxes is empty and level <3 go to next level
             level += 1
+            particle_system.add_level_complete_effect(WIDTH, HEIGHT)
+            achievement_system.update_progress('level_time', time_passed, level=level-1)
         if (level == 3 and target_boxes == [[], [], [], []]) or (mode == 1 and ammo == 0) or (
                 mode == 2 and time_remaining == 0):
             new_coords = True
             challenge_cooldown = 0
+            
+            # Update achievements for game completion
+            achievement_system.update_progress('trees_saved', impact_tracker.get_trees_saved())
 
             pygame.mixer.music.play()
 
