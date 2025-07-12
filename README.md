@@ -12,13 +12,16 @@ An arcade-style educational game that raises awareness about environmental clean
 
 ---
 
+
 ## 🌟 Features
 - 🎮 Arcade-style gameplay with increasing difficulty
 - 🗑️ Different trash items (paper, plastic, glass, etc.)
 - ⏱️ Countdown timer and real-time scoring
 - 💾 High-score tracking stored across sessions
-- 🎯 Modes: Accuracy, Speed, Freeplay
-- 📚 Eco-awareness integrated into gameplay elements
+- 🎯 Game Modes: Accuracy, Speed, Freeplay
+- 💥 **Score Multiplier Power-Up**: Collect a floating star to double your points temporarily
+- 🌱 **Eco-Fact Popups**: Learn interesting environmental facts between levels
+- 🔊 Immersive sound effects and music
 
 ---
 ## 📸 Screenshots
@@ -42,17 +45,20 @@ An arcade-style educational game that raises awareness about environmental clean
    python main.py
 
 ## 📚 What I Learned
-- Built and debugged a complete 2D game using Pygame  
-- Learned about game loops, event handling, and sprite animation  
-- Integrated file I/O to store and retrieve player scores  
-- Improved problem-solving by handling in-game collisions and logic  
-- Gained experience designing UI/UX for simple but intuitive gameplay  
-- Understood how to combine educational content with engaging design  
+- Built and debugged a complete 2D game using Pygame
+- Learned about game loops, event handling, and sprite animation
+- Integrated file I/O to store and retrieve player scores
+- Improved problem-solving by handling in-game collisions and logic
+- Gained experience designing UI/UX for simple but intuitive gameplay
+- Combined educational content with engaging design
+- Created power-up mechanics that affect game scoring dynamically
+- Displayed random fact popups to educate players in-between levels
 
 ## 💡 Future Improvements
 - Add different game levels with increasing difficulty and complexity  
 - Implement a global leaderboard using an online database or API  
 - Add animations and power-ups to make the game more dynamic  
+- Expand the fact system with voice narration and illustrations
 - Optimize the game for mobile platforms using Kivy or Pygbag  
 
 ## 🤝 Acknowledgments
