@@ -1,11 +1,6 @@
 # Litter Ballista!!!
 import pygame
 import math
-import random
-from powerups import PowerUpManager
-from environmental_facts import EnvironmentalFacts
-from sorting_challenge import SortingChallenge
-from weather_effects import WeatherEffect
 
 pygame.init()
 
@@ -16,7 +11,6 @@ timer = pygame.time.Clock()
 #fonts
 font = pygame.font.Font('assets/font/myFont.ttf', 32)
 big_font = pygame.font.Font('assets/font/myFont.ttf', 60)
-small_font = pygame.font.Font('assets/font/myFont.ttf', 24)
 
 #dimensions
 WIDTH = 900
@@ -37,11 +31,6 @@ level = 0
 points = 0
 total_shots = 0
 
-# Initialize new systems
-power_up_manager = PowerUpManager()
-environmental_facts = EnvironmentalFacts()
-sorting_challenge = SortingChallenge()
-weather_effect = WeatherEffect()
 
 
 #for mode 0=freeplay, 1=accuracy, 2=timed
@@ -61,8 +50,6 @@ pause = False
 clicked = False
 write_values = False
 new_coords = True
-show_challenge = False
-challenge_cooldown = 0
 
 one_coords = [[], [], []]
 two_coords = [[], [], []]
@@ -136,19 +123,10 @@ def draw_score():
 
 #making the gun and making it rotate to shoot
 def draw_gun():
-    global shot, total_shots
     mouse_pos = pygame.mouse.get_pos()
-    
-    # Apply weather effects to mouse position
-    mouse_pos = weather_effect.apply_wind_effect(mouse_pos)
-    
     gun_point = (WIDTH / 2, HEIGHT - 200)
     lasers = ['red', 'purple', 'green']
     clicks = pygame.mouse.get_pressed()                                             #storing the clicked status of the mouse in a list
-    
-    # Handle rapid fire power-up
-    rapid_fire_active = power_up_manager.is_active('rapid_fire')
-    
     if mouse_pos[0] != gun_point[0]:
         slope = (mouse_pos[1] - gun_point[1]) / (mouse_pos[0] - gun_point[0])
     else:
@@ -164,36 +142,19 @@ def draw_gun():
         if mouse_pos[1] < 600:
             screen.blit(pygame.transform.rotate(gun, 90 - rotation), (WIDTH / 2 - 90, HEIGHT - 250))
             if clicks[0]:
-                # Multi-shot power-up
-                if power_up_manager.is_active('multi_shot'):
-                    for i in range(3):
-                        offset_x = mouse_pos[0] + (i - 1) * 20
-                        offset_y = mouse_pos[1] + (i - 1) * 10
-                        pygame.draw.circle(screen, lasers[level - 1], (offset_x, offset_y), 5)
-                else:
-                    pygame.draw.circle(screen, lasers[level - 1], mouse_pos, 5)
+                pygame.draw.circle(screen, lasers[level - 1], mouse_pos, 5)
     else:
         gun = guns[level - 1]
         if mouse_pos[1] < 600:
             screen.blit(pygame.transform.rotate(gun, 270 - rotation), (WIDTH / 2 - 30, HEIGHT - 250))
             if clicks[0]:
-                # Multi-shot power-up
-                if power_up_manager.is_active('multi_shot'):
-                    for i in range(3):
-                        offset_x = mouse_pos[0] + (i - 1) * 20
-                        offset_y = mouse_pos[1] + (i - 1) * 10
-                        pygame.draw.circle(screen, lasers[level - 1], (offset_x, offset_y), 5)
-                else:
-                    pygame.draw.circle(screen, lasers[level - 1], mouse_pos, 5)
+                pygame.draw.circle(screen, lasers[level - 1], mouse_pos, 5)         #drawing a small circle in the color of our gun of radius 5
 
 
 
 
 #moving between the levels 
 def move_level(coords):
-    # Time freeze power-up slows down movement
-    speed_modifier = 0.3 if power_up_manager.is_active('time_freeze') else 1.0
-    
     if level == 1 or level == 2:
         max_val = 3
     else:
@@ -204,8 +165,7 @@ def move_level(coords):
             if my_coords[0] < -150:
                 coords[i][j] = (WIDTH, my_coords[1])                                 # if it moves to the left this code will keep moving it to the right
             else:
-                move_speed = (2 ** i) * speed_modifier
-                coords[i][j] = (my_coords[0] - move_speed, my_coords[1])
+                coords[i][j] = (my_coords[0] - 2 ** i, my_coords[1])
     return coords
 
 
@@ -233,44 +193,21 @@ def draw_level(coords):
 def check_shot(targets, coords):
     global points
     mouse_pos = pygame.mouse.get_pos()
-    
-    # Apply weather accuracy modifier
-    accuracy_mod = weather_effect.get_accuracy_modifier()
-    hit_detected = False
-    
-    # Multi-shot power-up increases hit area
-    hit_positions = [mouse_pos]
-    if power_up_manager.is_active('multi_shot'):
-        hit_positions.extend([
-            (mouse_pos[0] - 20, mouse_pos[1] - 10),
-            (mouse_pos[0] + 20, mouse_pos[1] + 10)
-        ])
-    
     for i in range(len(targets)):
         for j in range(len(targets[i])):
-            for hit_pos in hit_positions:
-                # Apply weather accuracy - random chance to miss
-                if random.random() > accuracy_mod:
-                    continue
-                    
-                if targets[i][j].collidepoint(hit_pos):
-                    coords[i].pop(j)
-                    base_points = 10 + 10 * (i ** 2)
-                    score_multiplier = power_up_manager.get_score_multiplier()
-                    points += base_points * score_multiplier
-                    hit_detected = True
-                    
-                    if level == 1:
-                        bird_sound.play()
-                    elif level == 2:
-                        plate_sound.play()
-                    elif level == 3:
-                        laser_sound.play()
-                    break
-            if hit_detected:
-                break
-        if hit_detected:
-            break
+            if targets[i][j].collidepoint(mouse_pos):
+                coords[i].pop(j)
+                points += 10 + 10 * (i ** 2)
+                #i is whateevr tire you are looking into and j is the place in the coords and where it is in the targets list 
+                #different points for different tiers
+
+
+                if level == 1:
+                    bird_sound.play()
+                elif level == 2:
+                    plate_sound.play()
+                elif level == 3:
+                    laser_sound.play()
     return coords
 
 
@@ -280,10 +217,8 @@ def check_shot(targets, coords):
 def draw_menu():
     global game_over, pause, mode, level, menu, time_passed, total_shots, points, ammo
     global time_remaining, best_freeplay, best_ammo, best_timed, write_values, clicked, new_coords
-    global challenge_cooldown
     game_over = False
     pause = False
-    challenge_cooldown = 0
     screen.blit(menu_img, (0, 0))
     mouse_pos = pygame.mouse.get_pos()
     clicks = pygame.mouse.get_pressed()
@@ -303,7 +238,6 @@ def draw_menu():
         points = 0
         clicked = True
         new_coords = True
-        environmental_facts.show_random_fact()
     if ammo_button.collidepoint(mouse_pos) and clicks[0] and not clicked:
         mode = 1
         level = 1
@@ -314,7 +248,6 @@ def draw_menu():
         points = 0
         clicked = True
         new_coords = True
-        environmental_facts.show_random_fact()
     if timed_button.collidepoint(mouse_pos) and clicks[0] and not clicked:
         mode = 2
         level = 1
@@ -325,7 +258,6 @@ def draw_menu():
         points = 0
         clicked = True
         new_coords = True
-        environmental_facts.show_random_fact()
     if reset_button.collidepoint(mouse_pos) and clicks[0] and not clicked:
         best_freeplay = 0
         best_ammo = 0
@@ -371,7 +303,6 @@ def draw_game_over():
 
 def draw_pause():
     global level, pause, menu, points, total_shots, time_passed, time_remaining, clicked, new_coords
-    global challenge_cooldown
     screen.blit(pause_img, (0, 0))
     mouse_pos = pygame.mouse.get_pos()
     clicks = pygame.mouse.get_pressed()
@@ -392,7 +323,6 @@ def draw_pause():
         time_remaining = 0
         clicked = True
         new_coords = True
-        challenge_cooldown = 0
 
 
 
@@ -407,23 +337,6 @@ while run:
             time_passed += 1
             if mode == 2:
                 time_remaining -= 1
-            
-            # Update challenge cooldown
-            if challenge_cooldown > 0:
-                challenge_cooldown -= 1
-
-    # Update systems
-    if level > 0:
-        power_up_manager.update()
-        weather_effect.update()
-        
-        # Trigger sorting challenge randomly
-        if not sorting_challenge.active and challenge_cooldown <= 0 and random.randint(1, 1800) == 1:  # ~30 second average
-            sorting_challenge.start_challenge()
-            challenge_cooldown = 1800  # 30 second cooldown
-    
-    environmental_facts.update()
-    sorting_challenge.update()
 
     if new_coords:
         # initialize enemy coordinates
@@ -478,39 +391,12 @@ while run:
     if level > 0:
         draw_gun()
         draw_score()
-        
-        # Draw new systems
-        power_up_manager.draw(screen, small_font)
-        power_up_manager.draw_active_effects(screen, small_font)
-        weather_effect.draw(screen)
-        weather_effect.draw_weather_indicator(screen, small_font)
-    
-    # Draw overlays (always on top)
-    environmental_facts.draw(screen, font, big_font)
-    sorting_challenge.draw(screen, font, big_font)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             mouse_position = pygame.mouse.get_pos()
-            
-            # Handle environmental facts click
-            if environmental_facts.handle_click():
-                continue
-            
-            # Handle sorting challenge clicks
-            if sorting_challenge.handle_completion_click():
-                points += sorting_challenge.get_bonus_points()
-                continue
-            
-            if sorting_challenge.handle_click(mouse_position):
-                continue
-            
-            # Handle power-up collection
-            if level > 0:
-                power_up_manager.check_collection(mouse_position, True)
-            
             if (0 < mouse_position[0] < WIDTH) and (0 < mouse_position[1] < HEIGHT - 200):
                 shot = True
                 total_shots += 1
@@ -537,7 +423,6 @@ while run:
         if (level == 3 and target_boxes == [[], [], [], []]) or (mode == 1 and ammo == 0) or (
                 mode == 2 and time_remaining == 0):
             new_coords = True
-            challenge_cooldown = 0
 
             pygame.mixer.music.play()
 
@@ -562,9 +447,6 @@ while run:
                 if points > best_timed:
                     best_timed = points
                     write_values = True
-            
-            # Show environmental fact at game over
-            environmental_facts.show_random_fact()
             game_over = True
     if write_values:
         file = open('high_scores.txt', 'w')                             #opening the highscore text file and w for write since we are going to be editing the high scores
