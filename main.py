@@ -4,6 +4,7 @@ import math
 #other imports from files
 from fact_popup import show_fact_popup
 from powerups import ScoreMultiplierPowerUp
+from client.player import Player
 
 pygame.init()
 
@@ -30,9 +31,10 @@ target_images = [[], [], []]
 targets = {1: [10, 5, 3],
            2: [12, 8, 5],
            3: [15, 12, 8, 3]}
+
 level = 0
-points = 0
-total_shots = 0
+
+player = Player()
 
 
 
@@ -113,9 +115,9 @@ pygame.mixer.music.play()
 
 #TO DISPLAY THE SCORE OF EACH OF THE MODES
 def draw_score():
-    points_text = font.render(f'Points: {points}', True, 'black')
+    points_text = font.render(f'Points: {player.score}', True, 'black')
     screen.blit(points_text, (320, 660))
-    shots_text = font.render(f'Total Shots: {total_shots}', True, 'black')
+    shots_text = font.render(f'Total Shots: {player.total_shots}', True, 'black')
     screen.blit(shots_text, (320, 687))
     time_text = font.render(f'Time Elapsed: {time_passed}', True, 'black')
     screen.blit(time_text, (320, 714))
@@ -203,16 +205,15 @@ def draw_level(coords):
 
 #checking when we have shot and we need to pass in the list of targets and the coordniate list 
 def check_shot(targets, coords):
-    global points
     mouse_pos = pygame.mouse.get_pos()
     for i in range(len(targets)):
         for j in range(len(targets[i])):
             if targets[i][j].collidepoint(mouse_pos):
                 coords[i].pop(j)
                 if score_multiplier.active:
-                    points += 2 * (10 + 10 * (i ** 2))
+                    player.score += 2 * (10 + 10 * (i ** 2))
                 else:
-                    points += 10 + 10 * (i ** 2)
+                    player.score += 10 + 10 * (i ** 2)
                 #i is whateevr tire you are looking into and j is the place in the coords and where it is in the targets list 
                 #different points for different tiers
 
@@ -230,7 +231,7 @@ def check_shot(targets, coords):
 
 
 def draw_menu():
-    global game_over, pause, mode, level, menu, time_passed, total_shots, points, ammo
+    global game_over, pause, mode, level, menu, time_passed, ammo
     global time_remaining, best_freeplay, best_ammo, best_timed, write_values, clicked, new_coords
     game_over = False
     pause = False
@@ -249,8 +250,8 @@ def draw_menu():
         level = 1
         menu = False
         time_passed = 0
-        total_shots = 0
-        points = 0
+        player.total_shots = 0
+        player.score = 0
         clicked = True
         new_coords = True
     if ammo_button.collidepoint(mouse_pos) and clicks[0] and not clicked:
@@ -259,8 +260,8 @@ def draw_menu():
         menu = False
         time_passed = 0
         ammo = 81
-        total_shots = 0
-        points = 0
+        player.total_shots = 0
+        player.score = 0
         clicked = True
         new_coords = True
     if timed_button.collidepoint(mouse_pos) and clicks[0] and not clicked:
@@ -269,8 +270,8 @@ def draw_menu():
         menu = False
         time_remaining = 30
         time_passed = 0
-        total_shots = 0
-        points = 0
+        player.total_shots = 0
+        player.score = 0
         clicked = True
         new_coords = True
     if reset_button.collidepoint(mouse_pos) and clicks[0] and not clicked:
@@ -288,11 +289,11 @@ def draw_menu():
 
 
 def draw_game_over():
-    global clicked, level, pause, game_over, menu, points, total_shots, time_passed, time_remaining
+    global clicked, level, pause, game_over, menu, time_passed, time_remaining
     if mode == 0:
         display_score = time_passed
     else:
-        display_score = points
+        display_score = player.score
     screen.blit(game_over_img, (0, 0))
     mouse_pos = pygame.mouse.get_pos()
     clicks = pygame.mouse.get_pressed()
@@ -305,8 +306,8 @@ def draw_game_over():
         pause = False
         game_over = False
         menu = True
-        points = 0
-        total_shots = 0
+        player.score = 0
+        player.total_shots = 0
         time_passed = 0
         time_remaining = 0
     if exit_button.collidepoint(mouse_pos) and clicks[0] and not clicked:
@@ -317,7 +318,7 @@ def draw_game_over():
 
 
 def draw_pause():
-    global level, pause, menu, points, total_shots, time_passed, time_remaining, clicked, new_coords
+    global level, pause, menu, time_passed, time_remaining, clicked, new_coords
     screen.blit(pause_img, (0, 0))
     mouse_pos = pygame.mouse.get_pos()
     clicks = pygame.mouse.get_pressed()
@@ -332,8 +333,8 @@ def draw_pause():
         level = 0
         pause = False
         menu = True
-        points = 0
-        total_shots = 0
+        player.score = 0
+        player.total_shots = 0
         time_passed = 0
         time_remaining = 0
         clicked = True
@@ -427,7 +428,7 @@ while run:
             if (0 < mouse_position[0] < WIDTH) and (0 < mouse_position[1] < HEIGHT - 200):
                 shot = True
                 score_multiplier.check_collision(mouse_position)
-                total_shots += 1
+                player.total_shots += 1
                 if mode == 1:
                     ammo -= 1
             if (670 < mouse_position[0] < 860) and (660 < mouse_position[1] < 715):
@@ -468,14 +469,14 @@ while run:
 
             #accuracy mode = points should be greater thna old score then overwirte the score
             if mode == 1:
-                if points > best_ammo:
-                    best_ammo = points
+                if player.score > best_ammo:
+                    best_ammo = player.score
                     write_values = True
             
             #timed mode = the points should be greater than old score then overwrite the score
             if mode == 2:
-                if points > best_timed:
-                    best_timed = points
+                if player.score > best_timed:
+                    best_timed = player.score
                     write_values = True
             game_over = True
     if write_values:
