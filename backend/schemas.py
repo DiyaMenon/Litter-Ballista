@@ -6,3 +6,13 @@ class ScoreCreate(BaseModel):
 
     class Config:
         from_attributes = True
+
+class LeaderboardResponse(BaseModel):
+    player_name: str
+    score: int
+
+    class Config:
+        from_attributes = True
+
+class SuccessResponse(BaseModel):
+    success: bool
