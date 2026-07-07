@@ -31,16 +31,13 @@ target_images = [[], [], []]
 targets = {1: [10, 5, 3],
            2: [12, 8, 5],
            3: [15, 12, 8, 3]}
-
 level = 0
 
+# Initialize Player instance
 player = Player()
-
-
 
 #for mode 0=freeplay, 1=accuracy, 2=timed
 mode = 0
-ammo = 0
 time_passed = 0
 time_remaining = 0
 counter = 1
@@ -124,7 +121,7 @@ def draw_score():
     if mode == 0:
         mode_text = font.render(f'Freeplay!', True, 'black')
     if mode == 1:
-        mode_text = font.render(f'Ammo Remaining: {ammo}', True, 'black')
+        mode_text = font.render(f'Ammo Remaining: {player.ammo}', True, 'black')
     if mode == 2:
         mode_text = font.render(f'Time Remaining {time_remaining}', True, 'black')
     screen.blit(mode_text, (320, 741))
@@ -231,7 +228,7 @@ def check_shot(targets, coords):
 
 
 def draw_menu():
-    global game_over, pause, mode, level, menu, time_passed, ammo
+    global game_over, pause, mode, level, menu, time_passed
     global time_remaining, best_freeplay, best_ammo, best_timed, write_values, clicked, new_coords
     game_over = False
     pause = False
@@ -259,7 +256,7 @@ def draw_menu():
         level = 1
         menu = False
         time_passed = 0
-        ammo = 81
+        player.ammo = 81
         player.total_shots = 0
         player.score = 0
         clicked = True
@@ -430,7 +427,7 @@ while run:
                 score_multiplier.check_collision(mouse_position)
                 player.total_shots += 1
                 if mode == 1:
-                    ammo -= 1
+                    player.ammo -= 1
             if (670 < mouse_position[0] < 860) and (660 < mouse_position[1] < 715):
                 resume_level = level
                 pause = True
@@ -451,7 +448,7 @@ while run:
             show_fact_popup(screen, font)  # ⬅️ Add this line to show a random fact
             level += 1
             new_coords = True              # Reset enemy positions
-        if (level == 3 and target_boxes == [[], [], [], []]) or (mode == 1 and ammo == 0) or (
+        if (level == 3 and target_boxes == [[], [], [], []]) or (mode == 1 and player.ammo == 0) or (
                 mode == 2 and time_remaining == 0):
             new_coords = True
 
