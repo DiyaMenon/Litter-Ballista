@@ -4,6 +4,7 @@ import math
 #other imports from files
 from fact_popup import show_fact_popup
 from powerups import ScoreMultiplierPowerUp
+from client.api import submit_score, get_leaderboard
 from client.player import Player
 
 pygame.init()
@@ -94,7 +95,16 @@ best_freeplay = int(read_file[0])
 best_ammo = int(read_file[1])
 best_timed = int(read_file[2])
 
-
+# Non-blocking synchronization layer to populate high scores if online data exists
+leaderboard_data = get_leaderboard()
+if leaderboard_data:
+    all_scores = [item.get("score", 0) for item in leaderboard_data if "score" in item]
+    if all_scores:
+        max_online_score = max(all_scores)
+        if max_online_score > best_ammo:
+            best_ammo = max_online_score
+        if max_online_score > best_timed:
+            best_timed = max_online_score
 
 #ADDING SOUNDS
 pygame.mixer.init()
@@ -458,20 +468,27 @@ while run:
 
             #freeplay = in freeplay mode the time should be less than the older time or it should be 0 (when we have never played before)
 
+            # TODO: Replace hardcoded placeholder with structural configuration or session manager
+            current_player_name = "Diya"
+
             if mode == 0:
+                submit_score(current_player_name, time_passed)
                 if time_passed < best_freeplay or best_freeplay == 0:
                     best_freeplay = time_passed
                     write_values = True
 
-
             #accuracy mode = points should be greater thna old score then overwirte the score
             if mode == 1:
+                submit_score(current_player_name, player.score)
                 if player.score > best_ammo:
                     best_ammo = player.score
                     write_values = True
+
+
             
             #timed mode = the points should be greater than old score then overwrite the score
             if mode == 2:
+                submit_score(current_player_name, player.score)
                 if player.score > best_timed:
                     best_timed = player.score
                     write_values = True
