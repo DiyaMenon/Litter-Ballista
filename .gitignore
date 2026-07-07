@@ -1,2 +1,14 @@
 node_modules/
 .env
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+
+# VS Code
+.vscode/
+
+# Environment files
+.env
